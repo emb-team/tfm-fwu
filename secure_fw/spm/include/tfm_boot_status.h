@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020, Arm Limited. All rights reserved.
+ * Copyright (c) 2018-2021, Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -21,6 +21,7 @@ extern "C" {
  */
 #define TLV_MAJOR_CORE     0x0
 #define TLV_MAJOR_IAS      0x1
+#define TLV_MAJOR_FWU      0x2
 
 /**
  * The shared data between boot loader and runtime SW is TLV encoded. The
@@ -155,11 +156,14 @@ extern "C" {
 #define MEASUREMENT_CLAIM_POS 3    /* 3 bit */
 
 #define GET_IAS_MODULE(tlv_type) (GET_MINOR(tlv_type) >> MODULE_POS)
-#define GET_IAS_CLAIM(tlv_type)  (GET_MINOR(tlv_type)  & CLAIM_MASK)
+#define GET_IAS_CLAIM(tlv_type)  (GET_MINOR(tlv_type) & CLAIM_MASK)
 #define SET_IAS_MINOR(sw_module, claim) (((sw_module) << 6) | (claim))
 
 #define GET_IAS_MEASUREMENT_CLAIM(ias_claim) ((ias_claim) >> \
                                               MEASUREMENT_CLAIM_POS)
+/* Firmware Update specific macros */
+#define SET_FWU_MINOR(sw_module, claim) (((sw_module) << 6) | (claim))
+#define GET_FWU_CLAIM(tlv_type)  (GET_MINOR(tlv_type)  & CLAIM_MASK)
 
 /* Magic value which marks the beginning of shared data area in memory */
 #define SHARED_DATA_TLV_INFO_MAGIC    0x2016

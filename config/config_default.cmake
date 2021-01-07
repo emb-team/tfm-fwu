@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Copyright (c) 2020, Arm Limited. All rights reserved.
+# Copyright (c) 2020-2021, Arm Limited. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -47,6 +47,7 @@ set(MCUBOOT_HW_ROLLBACK_PROT            ON          CACHE BOOL      "Enable secu
 set(MCUBOOT_ENC_IMAGES                  OFF         CACHE BOOL      "Enable encrypted image upgrade support")
 set(MCUBOOT_ENCRYPT_RSA                 OFF         CACHE BOOL      "Use RSA for encrypted image upgrade support")
 set(MCUBOOT_FIH_PROFILE                 OFF         CACHE STRING    "Fault injection hardening profile [OFF, LOW, MEDIUM, HIGH]")
+set(MCUBOOT_DATA_SHARING                OFF         CACHE BOOL      "Add sharing of application specific data using the same shared data area as for the measured boot")
 
 # Note - If either SIGNATURE_TYPE or KEY_LEN are changed, the entries for KEY_S
 # and KEY_NS will either have to be updated manually or removed from the cache.
@@ -125,6 +126,10 @@ set(TFM_PARTITION_PLATFORM              ON          CACHE BOOL      "Enable Plat
 set(TFM_PARTITION_AUDIT_LOG             ON          CACHE BOOL      "Enable Audit Log partition")
 
 set(FORWARD_PROT_MSG                    OFF         CACHE BOOL      "Whether to forward all PSA RoT messages to a Secure Enclave")
+if(NOT TFM_PSA_API)
+    set(TFM_PARTITION_FIRMWARE_UPDATE       ON          CACHE BOOL      "Enable firmware update partition")
+endif()
+set(TFM_FWU_BOOTLOADER_LIB             ${CMAKE_SOURCE_DIR}/secure_fw/partitions/firmware_update/bootloader/mcuboot/mcuboot_utilities.cmake CACHE FILEPATH    "Bootloader configure file for Firmware Update partition")
 
 ################################## Tests #######################################
 
@@ -159,6 +164,12 @@ set(MCUBOOT_VERSION                     "81d19f0"   CACHE STRING    "The version
 
 set(PSA_ARCH_TESTS_PATH                 "DOWNLOAD"  CACHE PATH      "Path to PSA arch tests (or DOWNLOAD to fetch automatically")
 set(PSA_ARCH_TESTS_VERSION              "90c8e680"  CACHE STRING    "The version of PSA arch tests to use")
+
+#################### BL2 Options dependending on partitions ###################
+
+if(TFM_PARTITION_FIRMWARE_UPDATE)
+    set(MCUBOOT_DATA_SHARING                ON         CACHE BOOL      "Add sharing of application specific data using the same shared data area as for the measured boot" FORCE)
+endif()
 
 ################################################################################
 ################################################################################

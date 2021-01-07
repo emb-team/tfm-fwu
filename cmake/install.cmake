@@ -109,6 +109,11 @@ if(TFM_PARTITION_PLATFORM)
             DESTINATION ${INSTALL_INTERFACE_INC_DIR})
 endif()
 
+if(TFM_PARTITION_FIRMWARE_UPDATE)
+    install(FILES       ${INTERFACE_INC_DIR}/firmware_update.h
+            DESTINATION ${INSTALL_INTERFACE_INC_DIR})
+endif()
+
 ####################### export sources #########################################
 
 if (TFM_MULTI_CORE_TOPOLOGY)
@@ -213,5 +218,12 @@ if(BL2)
     else()
         install(FILES ${MCUBOOT_KEY_S}
                 DESTINATION ${INSTALL_IMAGE_SIGINING_DIR}/keys)
+    endif()
+endif()
+
+if(TFM_PARTITION_FIRMWARE_UPDATE)
+    if(NOT TFM_PSA_API)
+        install(FILES       ${INTERFACE_SRC_DIR}/tfm_firmware_update_func_api.c
+        DESTINATION ${INSTALL_INTERFACE_SRC_DIR})
     endif()
 endif()

@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Copyright (c) 2020, Arm Limited. All rights reserved.
+# Copyright (c) 2020-2021, Arm Limited. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -26,6 +26,7 @@ add_subdirectory(partitions/protected_storage)
 add_subdirectory(partitions/internal_trusted_storage)
 add_subdirectory(partitions/platform)
 add_subdirectory(partitions/psa_proxy)
+add_subdirectory(partitions/firmware_update)
 add_subdirectory(spm)
 
 target_include_directories(secure_fw
