@@ -78,6 +78,27 @@
       "version": 1,
       "version_policy": "STRICT"
     },
+    {
+      "name": "TFM_FWU_QUERY",
+      "sid": "0x00000103",
+      "non_secure_clients": true,
+      "version": 1,
+      "version_policy": "STRICT"
+    },
+    {
+      "name": "TFM_FWU_REQUEST_REBOOT",
+      "sid": "0x00000104",
+      "non_secure_clients": true,
+      "version": 1,
+      "version_policy": "STRICT"
+    },
+    {
+      "name": "TFM_FWU_ACCEPT",
+      "sid": "0x00000105",
+      "non_secure_clients": true,
+      "version": 1,
+      "version_policy": "STRICT"
+    }
   ],
   "dependencies": [
     "TFM_CRYPTO"

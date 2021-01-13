@@ -8,24 +8,18 @@
 #include "firmware_update.h"
 #include "tfm_api.h"
 
-#ifdef TFM_PSA_API
 #include "psa/client.h"
 #include "psa_manifest/sid.h"
-#else
-#include "tfm_veneers.h"
-#endif
 
 #define IOVEC_LEN(x) (sizeof(x)/sizeof(x[0]))
 
-psa_status_t tfm_fwu_write(uint32_t uuid,
+psa_status_t tfm_fwu_write(const tfm_image_id_t uuid,
                            size_t image_offset,
-                           const void * block,
+                           const void *block,
                            size_t block_size)
 {
     psa_status_t status;
-#ifdef TFM_PSA_API
     psa_handle_t handle;
-#endif
 
     psa_invec in_vec[] = {
         { .base = &uuid, .len = sizeof(uuid) },
@@ -33,25 +27,16 @@ psa_status_t tfm_fwu_write(uint32_t uuid,
         { .base = block, .len = block_size }
     };
 
-#ifdef TFM_PSA_API
     handle = psa_connect(TFM_FWU_WRITE_SID, TFM_FWU_WRITE_VERSION);
     if (!PSA_HANDLE_IS_VALID(handle)) {
         return PSA_ERROR_GENERIC_ERROR;
     }
 
-    status = psa_call(handle, PSA_IPC_CALL, in_vec, IOVEC_LEN(in_vec), NULL, 0);
+    status = psa_call(handle, PSA_IPC_CALL, in_vec, IOVEC_LEN(in_vec), NULL,
+                      0);
 
     psa_close(handle);
-#else
-    status = tfm_tfm_fwu_write_req_veneer(in_vec, IOVEC_LEN(in_vec), NULL, 0);
-#endif
 
-    /* A parameter with a buffer pointer where its data length is longer than
-     * maximum permitted, it is treated as a secure violation.
-     * TF-M framework rejects the request with TFM_ERROR_INVALID_PARAMETER.
-     * The firmware update secure PSA implementation returns
-     * PSA_ERROR_INVALID_ARGUMENT in that case.
-     */
     if (status == (psa_status_t)TFM_ERROR_INVALID_PARAMETER) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
@@ -60,13 +45,11 @@ psa_status_t tfm_fwu_write(uint32_t uuid,
 }
 
 psa_status_t tfm_fwu_install(const tfm_image_id_t uuid,
-                             tfm_image_id_t * dependency_uuid,
+                             tfm_image_id_t *dependency_uuid,
                              tfm_image_version_t *dependency_version)
 {
     psa_status_t status;
-#ifdef TFM_PSA_API
     psa_handle_t handle;
-#endif
 
     psa_invec in_vec[] = {
         { .base = &uuid, .len = sizeof(uuid) }
@@ -81,7 +64,6 @@ psa_status_t tfm_fwu_install(const tfm_image_id_t uuid,
         return PSA_ERROR_INVALID_ARGUMENT;
     }
 
-#ifdef TFM_PSA_API
     handle = psa_connect(TFM_FWU_INSTALL_SID, TFM_FWU_INSTALL_VERSION);
     if (!PSA_HANDLE_IS_VALID(handle)) {
         return PSA_ERROR_GENERIC_ERROR;
@@ -91,17 +73,7 @@ psa_status_t tfm_fwu_install(const tfm_image_id_t uuid,
                       out_vec, IOVEC_LEN(out_vec));
 
     psa_close(handle);
-#else
-    status = tfm_tfm_fwu_install_req_veneer(in_vec, IOVEC_LEN(in_vec),
-                                            out_vec, IOVEC_LEN(out_vec));
-#endif
 
-    /* A parameter with a buffer pointer where its data length is longer than
-     * maximum permitted, it is treated as a secure violation.
-     * TF-M framework rejects the request with TFM_ERROR_INVALID_PARAMETER.
-     * The firmware update secure PSA implementation returns
-     * PSA_ERROR_INVALID_ARGUMENT in that case.
-     */
     if (status == (psa_status_t)TFM_ERROR_INVALID_PARAMETER) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
@@ -112,35 +84,22 @@ psa_status_t tfm_fwu_install(const tfm_image_id_t uuid,
 psa_status_t tfm_fwu_abort(const tfm_image_id_t uuid)
 {
     psa_status_t status;
-#ifdef TFM_PSA_API
     psa_handle_t handle;
-#endif
 
     psa_invec in_vec[] = {
         { .base = &uuid, .len = sizeof(uuid) }
     };
 
-#ifdef TFM_PSA_API
     handle = psa_connect(TFM_FWU_ABORT_SID, TFM_FWU_ABORT_VERSION);
     if (!PSA_HANDLE_IS_VALID(handle)) {
         return PSA_ERROR_GENERIC_ERROR;
     }
 
-    status = psa_call(handle, PSA_IPC_CALL, in_vec, IOVEC_LEN(in_vec),
-                      NULL, 0);
+    status = psa_call(handle, PSA_IPC_CALL, in_vec, IOVEC_LEN(in_vec), NULL,
+                      0);
 
     psa_close(handle);
-#else
-    status = tfm_tfm_fwu_abort_req_veneer(in_vec, IOVEC_LEN(in_vec),
-                                          NULL, 0);
-#endif
 
-    /* A parameter with a buffer pointer where its data length is longer than
-     * maximum permitted, it is treated as a secure violation.
-     * TF-M framework rejects the request with TFM_ERROR_INVALID_PARAMETER.
-     * The firmware update secure PSA implementation returns
-     * PSA_ERROR_INVALID_ARGUMENT in that case.
-     */
     if (status == (psa_status_t)TFM_ERROR_INVALID_PARAMETER) {
         return PSA_ERROR_INVALID_ARGUMENT;
     }
@@ -151,9 +110,7 @@ psa_status_t tfm_fwu_abort(const tfm_image_id_t uuid)
 psa_status_t tfm_fwu_query(const tfm_image_id_t uuid, tfm_image_info_t *info)
 {
     psa_status_t status;
-#ifdef TFM_PSA_API
     psa_handle_t handle;
-#endif
 
     psa_invec in_vec[] = {
         { .base = &uuid, .len = sizeof(uuid) }
@@ -162,32 +119,28 @@ psa_status_t tfm_fwu_query(const tfm_image_id_t uuid, tfm_image_info_t *info)
         { .base = info, .len = sizeof(*info)}
     };
 
-#ifdef TFM_PSA_API
-    handle = psa_connect(TFM_FWU_QUERY_SID, TFM_FWU_QUERY_VERSION);
+    handle = psa_connect(TFM_FWU_ABORT_SID, TFM_FWU_ABORT_VERSION);
     if (!PSA_HANDLE_IS_VALID(handle)) {
         return PSA_ERROR_GENERIC_ERROR;
     }
 
-    status = psa_call(handle, PSA_IPC_CALL, in_vec, IOVEC_LEN(in_vec),
-                      out_vec, IOVEC_LEN(out_vec));
+    status = psa_call(handle, PSA_IPC_CALL, in_vec, IOVEC_LEN(in_vec), out_vec,
+                      IOVEC_LEN(out_vec));
 
     psa_close(handle);
-#else
-    status = tfm_tfm_fwu_query_req_veneer(in_vec, IOVEC_LEN(in_vec),
-                                          out_vec, IOVEC_LEN(out_vec));
-#endif
+
+    if (status == (psa_status_t)TFM_ERROR_INVALID_PARAMETER) {
+        return PSA_ERROR_INVALID_ARGUMENT;
+    }
 
     return status;
 }
 
 psa_status_t tfm_fwu_request_reboot(void)
 {
-    psa_status_t status;
-#ifdef TFM_PSA_API
     psa_handle_t handle;
-#endif
+    psa_status_t status;
 
-#ifdef TFM_PSA_API
     handle = psa_connect(TFM_FWU_REQUEST_REBOOT_SID,
                          TFM_FWU_REQUEST_REBOOT_VERSION);
     if (!PSA_HANDLE_IS_VALID(handle)) {
@@ -197,9 +150,6 @@ psa_status_t tfm_fwu_request_reboot(void)
     status = psa_call(handle, PSA_IPC_CALL, NULL, 0, NULL, 0);
 
     psa_close(handle);
-#else
-    status = tfm_tfm_fwu_request_reboot_req_veneer(NULL, 0, NULL, 0);
-#endif
 
     if (status == (psa_status_t)TFM_ERROR_INVALID_PARAMETER) {
         return PSA_ERROR_INVALID_ARGUMENT;
@@ -210,12 +160,9 @@ psa_status_t tfm_fwu_request_reboot(void)
 
 psa_status_t tfm_fwu_accept(void)
 {
-    psa_status_t status;
-#ifdef TFM_PSA_API
     psa_handle_t handle;
-#endif
+    psa_status_t status;
 
-#ifdef TFM_PSA_API
     handle = psa_connect(TFM_FWU_ACCEPT_SID,
                          TFM_FWU_ACCEPT_VERSION);
     if (!PSA_HANDLE_IS_VALID(handle)) {
@@ -225,9 +172,6 @@ psa_status_t tfm_fwu_accept(void)
     status = psa_call(handle, PSA_IPC_CALL, NULL, 0, NULL, 0);
 
     psa_close(handle);
-#else
-    status = tfm_tfm_fwu_accept_req_veneer(NULL, 0, NULL, 0);
-#endif
 
     if (status == (psa_status_t)TFM_ERROR_INVALID_PARAMETER) {
         return PSA_ERROR_INVALID_ARGUMENT;
