@@ -90,10 +90,10 @@ static int convert_id_from_mcuboot_to_bl(uint8_t mcuboot_image_id,
 #else
     if (mcuboot_image_id == 0) {
         /* The image id in mcuboot. 0: the secure image. */
-        image_type == FWU_IMAGE_TYPE_SECURE
+        image_type = FWU_IMAGE_TYPE_SECURE;
     } else if (mcuboot_image_id == 1) {
         /* The image id in mcuboot. 1: the non-secure image. */
-        image_type == FWU_IMAGE_TYPE_NONSECURE
+        image_type = FWU_IMAGE_TYPE_NONSECURE;
     }  else {
         LOG_MSG("TFM FWU: invalid mcuboot image id\n\r: %d",
                 mcuboot_image_id);

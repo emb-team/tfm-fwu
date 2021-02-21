@@ -16,7 +16,7 @@ set(TEST_S                              OFF         CACHE BOOL      "Whether to 
 set(TEST_NS                             OFF         CACHE BOOL      "Whether to build NS regression tests")
 set(TEST_PSA_API                        ""          CACHE STRING    "Which (if any) of the PSA API tests should be compiled")
 
-set(TFM_PSA_API                         OFF         CACHE BOOL      "Use PSA api (IPC mode) instead of secure library mode")
+set(TFM_PSA_API                         ON         CACHE BOOL      "Use PSA api (IPC mode) instead of secure library mode")
 set(TFM_ISOLATION_LEVEL                 1           CACHE STRING    "Isolation level")
 set(TFM_PROFILE                         ""          CACHE STRING    "Profile to use")
 
@@ -123,7 +123,7 @@ set(ATTEST_INCLUDE_COSE_KEY_ID          OFF         CACHE BOOL      "Include COS
 
 set(TFM_PARTITION_PLATFORM              ON          CACHE BOOL      "Enable Platform partition")
 
-set(TFM_PARTITION_AUDIT_LOG             ON          CACHE BOOL      "Enable Audit Log partition")
+set(TFM_PARTITION_AUDIT_LOG             OFF         CACHE BOOL      "Enable Audit Log partition")
 
 set(FORWARD_PROT_MSG                    OFF         CACHE BOOL      "Whether to forward all PSA RoT messages to a Secure Enclave")
 

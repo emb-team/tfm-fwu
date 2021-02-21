@@ -202,11 +202,12 @@ static int32_t ARM_Flash_ProgramData(uint32_t addr, const void *data,
     }
 
     /* Check if the flash area to write the data was erased previously */
+ #if 0
     rc = is_flash_ready_to_write((const uint8_t*)start_addr, cnt);
     if (rc != 0) {
         return ARM_DRIVER_ERROR;
     }
-
+#endif
     /* Flash interface just emulated over SRAM, use memcpy */
     memcpy((void *)start_addr, data, cnt);
     return ARM_DRIVER_OK;

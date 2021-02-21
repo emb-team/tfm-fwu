@@ -47,6 +47,20 @@ int stdio_output_string(const unsigned char *str, uint32_t len)
     return STDIO_DRIVER.GetTxCount();
 }
 
+int stdio_input_string(unsigned char *str, uint32_t len)
+{
+    int32_t ret;
+
+    ret = STDIO_DRIVER.Receive(str, len);
+    if (ret != ARM_DRIVER_OK) {
+        return 0;
+    }
+    /* Add a busy wait after receiving. */
+    while (STDIO_DRIVER.GetStatus().rx_busy);
+
+    return STDIO_DRIVER.GetRxCount();
+}
+
 /* Redirects printf to STDIO_DRIVER in case of ARMCLANG*/
 #if defined(__ARMCC_VERSION)
 /* Struct FILE is implemented in stdio.h. Used to redirect printf to
@@ -73,6 +87,16 @@ int _write(int fd, char *str, int len)
     /* Send string and return the number of characters written */
     return stdio_output_string((const unsigned char *)str, (uint32_t)len);
 }
+
+/* Redirects scanf to STDIO_DRIVER in case of GNUARM */
+int _read(int fd, char *str, int len)
+{
+    (void)fd;
+
+    /* Receive string and return the number of characters written */
+    return stdio_input_string((unsigned char *)str, (uint32_t)len);
+}
+
 #elif defined(__ICCARM__)
 int putchar(int ch)
 {
